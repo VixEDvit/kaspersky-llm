@@ -1,0 +1,2 @@
+{"scenario": "short", "run": 4, "ttft_s": 1.174, "e2e_s": 5.064, "input_tokens": 46, "output_tokens": 32}
+{"scenario": "short", "run": 5, "ttft_s": 6.092, "e2e_s": 9.557, "input_tokens": 46, "output_tokens": 32}

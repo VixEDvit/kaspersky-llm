@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - model-storage.yaml
+  - model-config.yaml
+  - logging-config.yaml
+  - server.yaml
+  - service.yaml

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: qwen-server
+spec:
+  type: ClusterIP
+  selector:
+    app: qwen-server
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000

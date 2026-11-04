@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qwen-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qwen-server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: qwen-server
+    spec:
+      containers:
+      - args:
+        - /models/$(MODEL_REVISION)
+        - --served-model-name
+        - qwen
+        - --max-model-len
+        - $(MAX_MODEL_LEN)
+        - --max-num-seqs
+        - "1"
+        - --dtype
+        - float32
+        - --enforce-eager
+        - --host
+        - 0.0.0.0
+        - --port
+        - "8000"
+        - --log-config-file
+        - /opt/qwen-logging/logging.json
+        env:
+        - name: HF_HUB_OFFLINE
+          value: "1"
+        - name: VLLM_CPU_KVCACHE_SPACE
+          value: "1"
+        - name: VLLM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: API_KEY
+              name: model-access
+        - name: PYTHONPATH
+          value: /opt/qwen-logging
+        envFrom:
+        - configMapRef:
+            name: model-config
+        image: qwen-server:0.1
+        imagePullPolicy: Never
+        name: server
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          periodSeconds: 10
+          timeoutSeconds: 5
+        volumeMounts:
+        - mountPath: /models
+          name: weights
+          readOnly: true
+        - mountPath: /dev/shm
+          name: shared-memory
+        - mountPath: /opt/qwen-logging
+          name: logging
+          readOnly: true
+      initContainers:
+      - env:
+        - name: HF_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: HF_TOKEN
+              name: huggingface-access
+              optional: true
+        envFrom:
+        - configMapRef:
+            name: model-config
+        image: model-downloader:0.1
+        imagePullPolicy: Never
+        name: prepare-model
+        volumeMounts:
+        - mountPath: /models
+          name: weights
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+      volumes:
+      - name: weights
+        persistentVolumeClaim:
+          claimName: model-storage
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 256Mi
+        name: shared-memory
+      - configMap:
+          name: qwen-logging
+        name: logging

@@ -1,0 +1,6 @@
+{"scenario": "short", "run": 1, "ttft_s": 1.259, "e2e_s": 2.886, "input_tokens": 46, "output_tokens": 14}
+{"scenario": "long", "run": 1, "ttft_s": 5.756, "e2e_s": 9.23, "input_tokens": 606, "output_tokens": 32}
+{"scenario": "short", "run": 2, "ttft_s": 1.216, "e2e_s": 4.682, "input_tokens": 46, "output_tokens": 32}
+{"scenario": "long", "run": 2, "ttft_s": 3.927, "e2e_s": 6.964, "input_tokens": 606, "output_tokens": 32}
+{"scenario": "short", "run": 3, "ttft_s": 1.183, "e2e_s": 5.921, "input_tokens": 46, "output_tokens": 32}
+{"scenario": "long", "run": 3, "ttft_s": 3.747, "e2e_s": 7.645, "input_tokens": 606, "output_tokens": 32}

@@ -1,0 +1,49 @@
+apiVersion: v1
+data:
+  logging.json: |
+    {
+      "version": 1,
+      "disable_existing_loggers": false,
+      "filters": {
+        "chat_only": {"()": "request_logging.ChatAccessFilter"}
+      },
+      "formatters": {
+        "plain": {"format": "%(message)s"}
+      },
+      "handlers": {
+        "access": {
+          "class": "logging.StreamHandler",
+          "stream": "ext://sys.stdout",
+          "formatter": "plain",
+          "filters": ["chat_only"]
+        }
+      },
+      "loggers": {
+        "uvicorn.access": {
+          "handlers": ["access"],
+          "level": "INFO",
+          "propagate": false
+        }
+      }
+    }
+  request_logging.py: |
+    import logging
+
+
+    class ChatAccessFilter(logging.Filter):
+        def filter(self, record):
+            # Uvicorn передаёт адрес клиента, метод, путь, версию HTTP и статус.
+            args = record.args
+            if not isinstance(args, tuple) or len(args) != 5:
+                return False
+
+            _, method, path, _, status = args
+            if method != "POST" or path.split("?", 1)[0] != "/v1/chat/completions":
+                return False
+
+            record.msg = "chat_request status=%s"
+            record.args = (status,)
+            return True
+kind: ConfigMap
+metadata:
+  name: qwen-logging
