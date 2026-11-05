@@ -9,9 +9,9 @@ class ChatAccessFilter(logging.Filter):
             return False
 
         _, method, path, _, status = args
-        if method != "POST" or path.split("?", 1)[0] != "/v1/chat/completions":
+        if method != "POST" or path.split("?", 1)[0] not in ("/v1/chat/completions", "/v1/completions"):
             return False
 
-        record.msg = "chat_request status=%s"
+        record.msg = "completion_request status=%s" if path.split("?", 1)[0] == "/v1/completions" else "chat_request status=%s"
         record.args = (status,)
         return True
