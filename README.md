@@ -1,4 +1,4 @@
-# Qwen на CPU в Kubernetes
+# Qwen
 
 ## Описание проекта
 
